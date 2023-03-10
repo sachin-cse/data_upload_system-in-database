@@ -1,5 +1,5 @@
 import csv
-import mysql.connector
+import sqlite3
 import time
 import os
 import openpyxl
@@ -19,22 +19,17 @@ def insert_data(file_path):
         else:
             raise ValueError("Unsupported file format. Only .csv and .xlsx files are allowed.")
 
-        conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            database="raw"
-        )
-
+        conn = sqlite3.connect("./database/mydata.db")
         cursor = conn.cursor()
 
         # CREATE TABLE IF NOT EXISTS
         cursor.execute('''
-        CREATE TABLE IF NOT EXISTS data (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), age INT, email VARCHAR(255))
+        CREATE TABLE IF NOT EXISTS data (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, age INTEGER, email TEXT)
         ''')
 
         start_time = time.time()
         # data insert into the table
-        cursor.executemany('INSERT INTO data (name, age, email) VALUES (%s, %s, %s)', data)
+        cursor.executemany('INSERT INTO data (name, age, email) VALUES (?, ?, ?)', data)
 
         conn.commit()
         conn.close()

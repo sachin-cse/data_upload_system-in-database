@@ -1,12 +1,12 @@
 import os
 import csv
-import mysql.connector
+import sqlite3
 import pdfkit
 
     
 def download_file_csv():
     # connect to database connection
-    cnx = mysql.connector.connect(user='root', host='localhost', database='raw')
+    cnx = sqlite3.connect("./database/mydata.db")
     cursor = cnx.cursor()
 
     # write query
@@ -15,11 +15,11 @@ def download_file_csv():
     cursor.execute(query)
 
 # check output folder exit or not
-    if not os.path.exists(r'C:\\Upload_System\\output'):
-        os.mkdir(r'C:\\Upload_System\\output')
+    if not os.path.exists(r'D:\\Upload_System\\output'):
+        os.mkdir(r'D:\\Upload_System\\output')
     
     # write data to the output file
-    with open(r'C:\\Upload_System\\output\\csv\\output.csv', 'w', newline='') as csvfile:
+    with open(r'D:\\Upload_System\\output\\csv\\output.csv', 'w', newline='') as csvfile:
         csvwriter= csv.writer(csvfile)
         csvwriter.writerow([i[0] for i in cursor.description])
         csvwriter.writerows(cursor)
@@ -34,7 +34,7 @@ def download_file_csv():
 
 # download file in pdf format
 def download_file_pdf():
-    cnx = mysql.connector.connect(user='root', host='localhost', database='raw')
+    cnx = sqlite3.connect("./database/mydata.db")
     cursor = cnx.cursor()
 
 
@@ -43,21 +43,21 @@ def download_file_pdf():
 
     
     # get data as HTML table
-    html_table = "<table style='border-collapse:collapse; border:1px solid black; width:60%; margin:auto;'><tr>{}</tr>{}</table>".format(
+    html_table = "<table style='border-collapse:collapse; border:1px solid black; width:60%; margin:auto;'><caption style='font-weight:bold; font-size:20px; color:blue;'>Student Data</caption><tr>{}</tr>{}</table>".format(
         "".join("<th style='padding:10px; border:1px solid black; background-color:lightblue;'>{}</th>".format(column[0]) for column in cursor.description),
         "".join("<tr style='background-color: lightgray;'>{}</tr>".format(
             "".join("<td style='padding: 10px; border: 1px solid black;'>{}</td>".format(cell) for cell in row)
         ) for row in cursor.fetchall())
     )
 
-    if not os.path.exists(r'C:\\Upload_System\\output'):
-        os.mkdir(r'C:\\Upload_System\\output')
+    if not os.path.exists(r'D:\\Upload_System\\output'):
+        os.mkdir(r'D:\\Upload_System\\output')
 
-    with open(r'C:\\Upload_System\\output\\html\\output.html', 'w') as html_file:
+    with open(r'D:\\Upload_System\\output\\html\\output.html', 'w') as html_file:
         html_file.write(html_table)
 
     # convert HTML to PDF
-    pdfkit.from_file(r'C:\\Upload_System\\output\\html\\output.html', r'C:\\Upload_System\\output\\pdf\\output.pdf')
+    pdfkit.from_file(r'D:\\Upload_System\\output\\html\\output.html', r'D:\\Upload_System\\output\\pdf\\output.pdf')
 
     # show download successfully message
     print("File download successfully!")
